@@ -65,12 +65,12 @@ public class PlayersController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(responseJson);
             } else {
                 responseJson.put("estado", "error");
-                responseJson.put("msg","los servidores válidos son: \"Europa\", \"Américas\", \"SE Asíatico\", \"China\".");
+                responseJson.put("msg","Los servidores válidos son: \"Europa\", \"Américas\", \"SE Asíatico\", \"China\".");
                 return ResponseEntity.badRequest().body(responseJson);
             }
         } else {
             responseJson.put("estado", "error");
-            responseJson.put("msg","el mmr mínimo es 6500");
+            responseJson.put("msg","El mmr mínimo es 6500");
             return ResponseEntity.badRequest().body(responseJson);
         }
     }
@@ -90,21 +90,23 @@ public class PlayersController {
                 Players playerFromDb = byId.get();
 
 
-                if (playerFromDb.getMmr() != null)
+                if (playerFromDb.getMmr() != null){
                     playerFromDb.setMmr(playerRecibido.getMmr());
+                    if (playerRecibido.getMmr() <= 6500) {
+                        playersRepo.save(playerFromDb);
+                        String region = playerFromDb.getRegion();
 
+                        List<Players> playersByRegionSortedByMMR = playersRepo.playersSortedDescByMMR(region);
+                        updatePlayerPositions(playersByRegionSortedByMMR);
 
-                if (playerRecibido.getMmr() <= 6500) {
-                    playersRepo.save(playerFromDb);
+                        rpta.put("result", "ok");
+                        return ResponseEntity.ok(rpta);
+                    } else {
+                        rpta.put("result", "error");
+                        rpta.put("msg", "El mmr mínimo es 6500");
+                        return ResponseEntity.badRequest().body(rpta);
+                    }
                 }
-
-                String region = playerFromDb.getRegion();
-
-                List<Players> playersByRegionSortedByMMR = playersRepo.playersSortedDescByMMR(region);
-                updatePlayerPositions(playersByRegionSortedByMMR);
-
-                rpta.put("result", "ok");
-                return ResponseEntity.ok(rpta);
             } else {
                 rpta.put("result", "error");
                 rpta.put("msg", "El ID del player enviado no existe");
