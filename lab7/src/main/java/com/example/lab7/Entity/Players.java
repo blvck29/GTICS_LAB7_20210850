@@ -1,9 +1,6 @@
 package com.example.lab7.Entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +13,7 @@ import java.math.BigInteger;
 @Table(name = "players")
 public class Players {
 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private int PlayerId;
     @Column(name = "name")

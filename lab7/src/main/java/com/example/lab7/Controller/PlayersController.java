@@ -22,9 +22,30 @@ public class PlayersController {
     }
 
 
-    @GetMapping(value = "", produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE + "; charset=utf-8")
-    public List<Players> listarPlayers() {
-        return playersRepo.findAll();
+    @GetMapping(value = { "/{region}"})
+    public ResponseEntity<HashMap<String,Object>> listarPlayers(@PathVariable("region") String region) {
+
+        HashMap<String, Object> responseJson = new HashMap<>();
+
+        try {
+            List<Players> playersByRegionSortedByMMR = playersRepo.playersSortedDescByMMR(region);
+            updatePlayerPositions(playersByRegionSortedByMMR);
+            List<Players> playersByRegion = playersRepo.findAllByOrderByPositionAscAndByRegion(region);
+
+            if (!playersByRegion.isEmpty()){
+                responseJson.put("result","success");
+                responseJson.put("players", playersByRegion);
+                return ResponseEntity.ok().body(responseJson);
+            } else {
+                responseJson.put("result","failure");
+                responseJson.put("msg","Region no válida");
+                return ResponseEntity.badRequest().body(responseJson);
+            }
+        } catch (Exception e) {
+            responseJson.put("result","failure");
+            responseJson.put("msg","Region no válida");
+            return ResponseEntity.badRequest().body(responseJson);
+        }
     }
 
 
@@ -110,6 +131,16 @@ public class PlayersController {
         }
     }
 
+
+
+    private void updatePlayerPositions(List<Players> playersSortedByMMR) {
+
+        for (int i = 0; i < playersSortedByMMR.size(); i++) {
+            Players player = playersSortedByMMR.get(i);
+            player.setPosition(i + 1);
+            playersRepo.save(player);
+        }
+    }
 
 
 
