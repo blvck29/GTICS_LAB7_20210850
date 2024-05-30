@@ -63,8 +63,8 @@ public class PlayersController {
 
 
 
-    // ACTUALIZAR
-    @PutMapping(value = {"", "/"}, consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    // ACTUALIZAR MMR PERO TAMBIÉN OTROS VALORES PUNTUALES
+    @PutMapping(value = { "/mmr"}, consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public ResponseEntity<HashMap<String, Object>> actualizarPlayer(Players playerRecibido) {
 
         HashMap<String, Object> rpta = new HashMap<>();
@@ -86,6 +86,12 @@ public class PlayersController {
 
 
                 playersRepo.save(playerFromDb);
+
+                String region = playerFromDb.getRegion();
+
+                List<Players> playersByRegionSortedByMMR = playersRepo.playersSortedDescByMMR(region);
+                updatePlayerPositions(playersByRegionSortedByMMR);
+
                 rpta.put("result", "ok");
                 return ResponseEntity.ok(rpta);
             } else {
@@ -100,9 +106,9 @@ public class PlayersController {
         }
     }
 
-    // /Product?id
-    @DeleteMapping("")
-    public ResponseEntity<HashMap<String, Object>> borrarPlayer(@RequestParam("id") String idStr){
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<HashMap<String, Object>> borrarPlayer(@PathVariable("id") String idStr){
 
         try{
             int id = Integer.parseInt(idStr);
@@ -111,7 +117,16 @@ public class PlayersController {
 
             Optional<Players> byId = playersRepo.findById(id);
             if(byId.isPresent()){
+
+                Players playerToDelete = byId.get();
+
+                String region = playerToDelete.getRegion();
+
                 playersRepo.deleteById(id);
+
+                List<Players> playersByRegionSortedByMMR = playersRepo.playersSortedDescByMMR(region);
+                updatePlayerPositions(playersByRegionSortedByMMR);
+
                 rpta.put("result","OK");
             }else{
                 rpta.put("result","No OK");
