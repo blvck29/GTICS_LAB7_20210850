@@ -52,15 +52,11 @@ public class PlayersController {
     // CREAR /product y /product/
     @PostMapping(value = {"", "/"})
     public ResponseEntity<HashMap<String, Object>> guardarPlayer(
-            @RequestBody Players product,
-            @RequestParam(value = "fetchId", required = false) boolean fetchId) {
+            @RequestBody Players player) {
 
         HashMap<String, Object> responseJson = new HashMap<>();
 
-        playersRepo.save(product);
-        if (fetchId) {
-            responseJson.put("id", product.getPlayerId());
-        }
+        playersRepo.save(player);
         responseJson.put("estado", "creado");
         return ResponseEntity.status(HttpStatus.CREATED).body(responseJson);
     }
@@ -84,9 +80,6 @@ public class PlayersController {
 
                 if (playerFromDb.getMmr() != null)
                     playerFromDb.setMmr(playerRecibido.getMmr());
-
-                if (playerFromDb.getPosition() != null)
-                    playerFromDb.setPosition(playerRecibido.getPosition());
 
                 if (playerFromDb.getRegion() != null)
                     playerFromDb.setRegion(playerRecibido.getRegion());

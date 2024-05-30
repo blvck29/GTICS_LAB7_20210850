@@ -1,5 +1,6 @@
 package com.example.lab7.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import java.math.BigInteger;
 @Getter
 @Setter
 
+@JsonIgnoreProperties(value = {"position"})
 @Table(name = "players")
 public class Players {
 
