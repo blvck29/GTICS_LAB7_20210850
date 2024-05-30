@@ -21,7 +21,7 @@ public class Players {
     @Column(name = "name")
     private String name;
     @Column(name = "mmr")
-    private BigInteger mmr;
+    private Integer mmr;
     @Column(name = "position")
     private Integer position;
     @Column(name = "region")

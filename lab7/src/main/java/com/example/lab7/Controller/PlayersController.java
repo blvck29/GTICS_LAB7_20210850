@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -52,19 +53,31 @@ public class PlayersController {
 
     // CREAR /product y /product/
     @PostMapping(value = {"", "/"})
-    public ResponseEntity<HashMap<String, Object>> guardarPlayer(
-            @RequestBody Players player) {
+    public ResponseEntity<HashMap<String, Object>> guardarPlayer(@RequestBody Players player) {
 
         HashMap<String, Object> responseJson = new HashMap<>();
 
-        playersRepo.save(player);
-        responseJson.put("estado", "creado");
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseJson);
+        if (player.getMmr() >= 6500) {
+
+            if (player.getRegion().equals("Europa") || player.getRegion().equals("Américas") || player.getRegion().equals("SE Asíatico") || player.getRegion().equals("China")){
+                playersRepo.save(player);
+                responseJson.put("estado", "creado");
+                return ResponseEntity.status(HttpStatus.CREATED).body(responseJson);
+            } else {
+                responseJson.put("estado", "error");
+                responseJson.put("msg","los servidores válidos son: \"Europa\", \"Américas\", \"SE Asíatico\", \"China\".");
+                return ResponseEntity.badRequest().body(responseJson);
+            }
+        } else {
+            responseJson.put("estado", "error");
+            responseJson.put("msg","el mmr mínimo es 6500");
+            return ResponseEntity.badRequest().body(responseJson);
+        }
     }
 
 
 
-    // ACTUALIZAR MMR PERO TAMBIÉN OTROS VALORES PUNTUALES
+    // ACTUALIZAR MMR
     @PutMapping(value = { "/mmr"}, consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public ResponseEntity<HashMap<String, Object>> actualizarPlayer(Players playerRecibido) {
 
@@ -76,17 +89,14 @@ public class PlayersController {
             if (byId.isPresent()) {
                 Players playerFromDb = byId.get();
 
-                if (playerFromDb.getName() != null)
-                    playerFromDb.setName(playerRecibido.getName());
 
                 if (playerFromDb.getMmr() != null)
                     playerFromDb.setMmr(playerRecibido.getMmr());
 
-                if (playerFromDb.getRegion() != null)
-                    playerFromDb.setRegion(playerRecibido.getRegion());
 
-
-                playersRepo.save(playerFromDb);
+                if (playerRecibido.getMmr() <= 6500) {
+                    playersRepo.save(playerFromDb);
+                }
 
                 String region = playerFromDb.getRegion();
 
