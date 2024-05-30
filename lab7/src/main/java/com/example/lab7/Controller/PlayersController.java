@@ -30,7 +30,8 @@ public class PlayersController {
         try {
             List<Players> playersByRegionSortedByMMR = playersRepo.playersSortedDescByMMR(region);
             updatePlayerPositions(playersByRegionSortedByMMR);
-            List<Players> playersByRegion = playersRepo.findAllByOrderByPositionAscAndByRegion(region);
+
+            List<Players> playersByRegion = playersRepo.findTop10ByRegionOrderByPositionAsc(region);
 
             if (!playersByRegion.isEmpty()){
                 responseJson.put("result","success");

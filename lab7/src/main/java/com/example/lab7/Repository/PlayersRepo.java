@@ -12,6 +12,9 @@ import java.util.List;
 @Repository
 public interface PlayersRepo extends JpaRepository<Players, Integer> {
 
+    @Query("SELECT p FROM Players p WHERE p.region = :region ORDER BY p.position ASC LIMIT 10")
+    List<Players> findTop10ByRegionOrderByPositionAsc(@Param("region") String region);
+
     @Query("SELECT p FROM Players p WHERE p.region = :region ORDER BY p.position ASC")
     List<Players> findAllByOrderByPositionAscAndByRegion(@Param("region") String region);
 
