@@ -89,9 +89,9 @@ public class PlayersController {
             if (byId.isPresent()) {
                 Players playerFromDb = byId.get();
 
-
                 if (playerFromDb.getMmr() != null){
                     playerFromDb.setMmr(playerRecibido.getMmr());
+
                     if (playerRecibido.getMmr() <= 6500) {
                         playersRepo.save(playerFromDb);
                         String region = playerFromDb.getRegion();
@@ -101,11 +101,16 @@ public class PlayersController {
 
                         rpta.put("result", "ok");
                         return ResponseEntity.ok(rpta);
+
                     } else {
                         rpta.put("result", "error");
                         rpta.put("msg", "El mmr mínimo es 6500");
                         return ResponseEntity.badRequest().body(rpta);
                     }
+                } else {
+                    rpta.put("result", "error");
+                    rpta.put("msg", "El ID del player enviado no existe");
+                    return ResponseEntity.badRequest().body(rpta);
                 }
             } else {
                 rpta.put("result", "error");
